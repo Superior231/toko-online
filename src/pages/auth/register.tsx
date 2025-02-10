@@ -1,38 +1,42 @@
-import Link from "next/link";
-import Image from "next/image";
 import Title from "@/components/Title";
+import Image from "next/image";
+import Link from "next/link";
 import "./Auth.css";
 import { useState } from "react";
 import { useRouter } from "next/router";
 
-const Login = () => {
+export default function Register() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("user"); // Default role user
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLogin = async () => {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+  const handleRegister = async () => {
+    setError('');
+    
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password, role }),
     });
 
     const data = await res.json();
-    if (data.token) {
-      localStorage.setItem("token", data.token);
-      const user = JSON.parse(atob(data.token.split(".")[1]));
-      if (user.role === "admin") router.push("/admin/dashboard");
-      else router.push("/user/dashboard");
+    if (res.ok) {
+      alert('Registrasi berhasil! Silakan login.');
+      router.push('/auth/login');
     } else {
-      alert("Login failed");
+      setError(data.error || 'Terjadi kesalahan.');
     }
   };
 
+
   return (
     <>
-      <Title title="Login" />
+      <Title title="Register" />
       <div className="absolute inset-0 flex items-center justify-center w-full">
-        <div className="mx-auto p-5 sm:p-10">
+        <div className="min-w-[auto] w-[400px] max-w-[1000px] mx-auto p-5 md:p-10">
           <div className="header flex flex-col items-center gap-5">
             <Image
               src="/logo_ppj.png"
@@ -42,11 +46,33 @@ const Login = () => {
               height={70}
             />
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-color">
-              Login
+              Sign up
             </h1>
           </div>
 
+          {error && <p style={{ color: "red" }}>{error}</p>}
+
           <form className="flex flex-col gap-4 mt-5 sm:mt-10">
+              <input
+                type="text"
+                id="role"
+                placeholder="Role"
+                value={role}
+                onChange={() => setRole('user')}
+                hidden
+              />
+            <div className="content">
+              <div className="pass-logo">
+                <i className="bx bx-user"></i>
+              </div>
+              <input
+                type="username"
+                id="username"
+                placeholder="Username"
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+
             <div className="content">
               <div className="pass-logo">
                 <i className="bx bx-envelope"></i>
@@ -71,13 +97,24 @@ const Login = () => {
               />
             </div>
 
+            <div className="content">
+              <div className="pass-logo">
+                <i className="bx bx-lock-alt"></i>
+              </div>
+              <input
+                type="confirm_password"
+                id="confirm_password"
+                placeholder="Confirm password"
+              />
+            </div>
+
             <div className="flex flex-col gap-1 mt-3">
               <button
                 className="btn btn-primary d-block fw-semibold w-full"
                 type="submit"
-                onClick={handleLogin}
+                onClick={handleRegister}
               >
-                Login
+                Sign up
               </button>
               <span className="fw-semibold text-center py-0 my-0 text-color w-full">
                 or
@@ -92,21 +129,19 @@ const Login = () => {
                   height={20}
                   alt="Google Icon"
                 />
-                Login with Google
+                Sign up with Google
               </a>
             </div>
           </form>
 
           <p className="text-center text-color mt-3">
-            Not registered yet? &nbsp;
-            <Link href={"/auth/register"} className="text-orange-500 underline">
-              Create an account!
+            Have an account? &nbsp;
+            <Link href={"/auth/login"} className="text-orange-500 underline">
+              Login here!
             </Link>
           </p>
         </div>
       </div>
     </>
   );
-};
-
-export default Login;
+}
