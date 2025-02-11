@@ -1,36 +1,20 @@
 import Title from "@/components/Title";
 import Image from "next/image";
 import Link from "next/link";
-import "./Auth.css";
 import { useState } from "react";
-import { useRouter } from "next/router";
+import "./Auth.css";
 
-export default function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("user"); // Default role user
-  const [error, setError] = useState("");
-  const router = useRouter();
+const Register = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleRegister = async () => {
-    setError('');
-    
-    const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, role }),
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      alert('Registrasi berhasil! Silakan login.');
-      router.push('/auth/login');
-    } else {
-      setError(data.error || 'Terjadi kesalahan.');
-    }
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
+  const handleClickShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   return (
     <>
@@ -50,69 +34,76 @@ export default function Register() {
             </h1>
           </div>
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
-
           <form className="flex flex-col gap-4 mt-5 sm:mt-10">
-              <input
-                type="text"
-                id="role"
-                placeholder="Role"
-                value={role}
-                onChange={() => setRole('user')}
-                hidden
-              />
             <div className="content">
               <div className="pass-logo">
                 <i className="bx bx-user"></i>
               </div>
-              <input
-                type="username"
-                id="username"
-                placeholder="Username"
-                onChange={(e) => setName(e.target.value)}
-              />
+              <input type="username" id="username" placeholder="Username" />
             </div>
 
             <div className="content">
               <div className="pass-logo">
                 <i className="bx bx-envelope"></i>
               </div>
-              <input
-                type="email"
-                id="email"
-                placeholder="Email address"
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <input type="email" id="email" placeholder="Email address" />
             </div>
 
             <div className="content">
               <div className="pass-logo">
                 <i className="bx bx-lock-alt"></i>
               </div>
-              <input
-                type="password"
-                id="password"
-                placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  placeholder="Password"
+                  required
+                  style={{ paddingRight: "45px" }}
+                />
+                <div
+                  className="absolute top-0 right-0 pr-[15px] h-full flex items-center justify-center px-2 cursor-pointer"
+                  onClick={handleClickShowPassword}
+                >
+                  <i
+                    className={`fa-regular ${
+                      showPassword ? "fa-eye" : "fa-eye-slash"
+                    } text-gray-500`}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="content">
               <div className="pass-logo">
                 <i className="bx bx-lock-alt"></i>
               </div>
-              <input
-                type="confirm_password"
-                id="confirm_password"
-                placeholder="Confirm password"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirm_password"
+                  placeholder="Confirm password"
+                  required
+                  style={{ paddingRight: "45px" }}
+                />
+                <div
+                  className="absolute top-0 right-0 pr-[15px] h-full flex items-center justify-center px-2 cursor-pointer"
+                  onClick={handleClickShowConfirmPassword}
+                >
+                  <i
+                    className={`fa-regular ${
+                      showConfirmPassword ? "fa-eye" : "fa-eye-slash"
+                    } text-gray-500`}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col gap-1 mt-3">
               <button
                 className="btn btn-primary d-block fw-semibold w-full"
                 type="submit"
-                onClick={handleRegister}
               >
                 Sign up
               </button>
@@ -136,7 +127,7 @@ export default function Register() {
 
           <p className="text-center text-color mt-3">
             Have an account? &nbsp;
-            <Link href={"/auth/login"} className="text-orange-500 underline">
+            <Link href={"/auth/login"} className="underline">
               Login here!
             </Link>
           </p>
@@ -144,4 +135,7 @@ export default function Register() {
       </div>
     </>
   );
-}
+};
+
+export default Register;
+

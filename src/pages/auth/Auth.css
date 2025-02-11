@@ -69,8 +69,7 @@ label {
     z-index: 999;
 }
 
-.content .pass-logo i.bx,
-.showPass {
+.content .pass-logo i.bx {
     color: var(--input-color);
     position: relative;
 }

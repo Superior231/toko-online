@@ -1,31 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import Title from "@/components/Title";
-import "./Auth.css";
 import { useState } from "react";
-import { useRouter } from "next/router";
+import "./Auth.css";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async () => {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-    if (data.token) {
-      localStorage.setItem("token", data.token);
-      const user = JSON.parse(atob(data.token.split(".")[1]));
-      if (user.role === "admin") router.push("/admin/dashboard");
-      else router.push("/user/dashboard");
-    } else {
-      alert("Login failed");
-    }
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -51,31 +34,39 @@ const Login = () => {
               <div className="pass-logo">
                 <i className="bx bx-envelope"></i>
               </div>
-              <input
-                type="email"
-                id="email"
-                placeholder="Email address"
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <input type="email" id="email" placeholder="Email address" />
             </div>
 
             <div className="content">
               <div className="pass-logo">
                 <i className="bx bx-lock-alt"></i>
               </div>
-              <input
-                type="password"
-                id="password"
-                placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  placeholder="Password"
+                  required
+                  style={{ paddingRight: "45px" }}
+                />
+                <div
+                  className="absolute top-0 right-0 pr-[15px] h-full flex items-center justify-center px-2 cursor-pointer"
+                  onClick={handleClickShowPassword}
+                >
+                  <i
+                    className={`fa-regular ${
+                      showPassword ? "fa-eye" : "fa-eye-slash"
+                    } text-gray-500`}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col gap-1 mt-3">
               <button
                 className="btn btn-primary d-block fw-semibold w-full"
                 type="submit"
-                onClick={handleLogin}
               >
                 Login
               </button>
@@ -99,7 +90,7 @@ const Login = () => {
 
           <p className="text-center text-color mt-3">
             Not registered yet? &nbsp;
-            <Link href={"/auth/register"} className="text-orange-500 underline">
+            <Link href={"/auth/register"} className="underline">
               Create an account!
             </Link>
           </p>
